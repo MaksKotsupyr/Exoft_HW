@@ -13,7 +13,7 @@ namespace HW_1
                 new DefaultCar("Lanos", 2005, 3000, 4),
                 new Motobike("BMW", 2010, 31130, 2),
                 new Truck("Volvo", 2021, 54405, 8),
-                new DefaultCar("BMW", 2018, 18240, 4)
+                new DefaultCar("Lexus", 2018, 28240, 4)
             };
 
             parking.ShowAllVehicles();
