@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HW_1
 {
-    public class Vehicle
+    public abstract class Vehicle
     {
         public Vehicle(string brand, int year, int price, int seatsNumber)
         {
