@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CallsThreads;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace HW3_Task
     {
         static void Main()
         {
+            var threads = new List<Thread>();
             int count = 1;
             var tokens = new List<CancellationTokenSource>();
             var callList = new List<Call>
@@ -45,7 +47,9 @@ namespace HW3_Task
                                 var cts = new CancellationTokenSource();
                                 var token = cts.Token;
                                 tokens.Add(cts);
-                                var task = CallMaking.CallAsync(call, token, count++);
+                                var thread = new Thread(CallMaking.ManageCallThread);
+                                threads.Add(thread);
+                                thread.Start(new ThreadProps { Call = call, Token = token, Count = count });
                             }
                             else
                             {
@@ -59,7 +63,7 @@ namespace HW3_Task
                 {
                     Console.WriteLine("To cancel call write 'ID' of call");
                     string idNumber = Console.ReadLine();
-                    if(tokens.Count <= 0)
+                    if (tokens.Count <= 0)
                     {
                         Console.WriteLine("Not active calls");
                     }
@@ -67,8 +71,11 @@ namespace HW3_Task
                     {
                         if (call.Status == CallStatus.InProgress && Int32.TryParse(idNumber, out int IdCall) && tokens.Count > 1)
                         {
-                            tokens[IdCall - 1].Cancel();
-                            tokens[IdCall - 1].Dispose();
+                            lock (call)
+                            {
+                                //tokens[IdCall - 1].Cancel();
+                                threads[IdCall - 1].Abort();
+                            }
                         }
                     }
                 }
