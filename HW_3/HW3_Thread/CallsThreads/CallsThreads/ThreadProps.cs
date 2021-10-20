@@ -4,11 +4,11 @@ using HW3_Task;
 
 namespace CallsThreads
 {
-    public class ThreadArgs
+    public class ThreadProps
     {
-            public Call Call { get; init; }
+            public Call Call { get; set; }
 
-            public CancellationToken Token { get; init; }
+            public CancellationToken Token { get; set; }
 
             public int Count { get; set; }
     }

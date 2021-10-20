@@ -12,7 +12,7 @@ namespace HW3_Task
         {
             var threads = new List<Thread>();
             int count = 1;
-            var tokens = new List<CancellationTokenSource>();
+            var tokensList = new List<CancellationTokenSource>();
             var callList = new List<Call>
             {
                 new Call(9000, 2340),
@@ -46,10 +46,10 @@ namespace HW3_Task
                             {
                                 var cts = new CancellationTokenSource();
                                 var token = cts.Token;
-                                tokens.Add(cts);
+                                tokensList.Add(cts);
                                 var thread = new Thread(CallMaking.ManageCallThread);
                                 threads.Add(thread);
-                                thread.Start(new ThreadProps { Call = call, Token = token, Count = count });
+                                thread.Start(new ThreadProps { Call = call, Token = token, Count = count++ });
                             }
                             else
                             {
@@ -63,18 +63,20 @@ namespace HW3_Task
                 {
                     Console.WriteLine("To cancel call write 'ID' of call");
                     string idNumber = Console.ReadLine();
-                    if (tokens.Count <= 0)
+                    if (tokensList.Count <= 0)
                     {
                         Console.WriteLine("Not active calls");
                     }
                     foreach (var call in callList)
                     {
-                        if (call.Status == CallStatus.InProgress && Int32.TryParse(idNumber, out int IdCall) && tokens.Count > 1)
+                        if (call.Status == CallStatus.InProgress && Int32.TryParse(idNumber, out int IdCall) && tokensList.Count > 1)
                         {
-                            lock (call)
+                            var calling = callList[IdCall - 1];
+
+                            lock (calling)
                             {
-                                //tokens[IdCall - 1].Cancel();
-                                threads[IdCall - 1].Abort();
+                                tokensList[IdCall - 1].Cancel();
+                                Monitor.Pulse(calling);
                             }
                         }
                     }
